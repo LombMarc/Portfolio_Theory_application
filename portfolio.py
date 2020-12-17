@@ -21,12 +21,13 @@ def Log_return(stk,Yframe):
         rtrn.append(Average_return)
     return rtrn
 Average_Q_Return = Log_return(stocks,5)
-#cc
-def STD(stk,Yframe):
+
+def Covariance(stk,Yframe):
+    Stock_MTRX = pandas.DataFrame()
     Edt = dt.date.today()
     Sdt = Edt - dt.timedelta(days=365 * Yframe)
-    std = []
     for x in stk:
+        filler = 0
         atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
         Qrtrn = pandas.DataFrame()
         Qrtrn['r'] = atl['Close'].resample('Q').ffill().pct_change()
@@ -34,8 +35,15 @@ def STD(stk,Yframe):
         QRtrn.sort()
         del QRtrn[0:int(len(QRtrn) * 0.05)]
         del QRtrn[(len(QRtrn) - int(len(QRtrn) * 0.05)):-1]
-        STD_Q = np.std(QRtrn)
-        std.append(STD_Q)
-    return std
-Standard_Deviation_Q = STD(stocks,5)
-print(Standard_Deviation_Q)
+        Stock_MTRX[x] = np.asarray(QRtrn)
+    cova = Stock_MTRX.cov()
+    return cova
+Covar = Covariance(stocks,5)
+st = np.dot(weight.T,np.dot(Covar,weight))**0.5
+
+
+print("Stock Quarterly return average: "+Average_Q_Return)
+print("Covariance matrix of the stock return: ")
+print(Covar)
+print(weight)
+print(st)
