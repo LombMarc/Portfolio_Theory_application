@@ -2,8 +2,15 @@ import pandas_datareader as pd
 import pandas
 import numpy as np
 import datetime as dt
+import scipy as sp
 
-stocks = ['atl.mi','race.mi','ENI.MI']
+stocks = ['ATL.MI','ENI.MI', 'STM.MI','SRG.MI','IP.MI','FBK.MI']
+amnt = [100,100,100,100,100,150]
+SUM =sum(amnt)
+weight =[]
+for w in amnt:
+    weight.append((w/SUM))
+weight=np.asarray(weight)
 
 def Log_return(stk,Yframe):
     Edt = dt.date.today()
@@ -12,7 +19,7 @@ def Log_return(stk,Yframe):
     for x in stk:
         atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
         Qrtrn = pandas.DataFrame()
-        Qrtrn['r'] = atl['Close'].resample('Q').ffill().pct_change()
+        Qrtrn['r'] = atl['Close'].resample('M').ffill().pct_change()
         QRtrn = Qrtrn['r'].to_list()
         QRtrn.sort()
         del QRtrn[0:int(len(QRtrn) * 0.05)]
@@ -30,7 +37,7 @@ def Covariance(stk,Yframe):
         filler = 0
         atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
         Qrtrn = pandas.DataFrame()
-        Qrtrn['r'] = atl['Close'].resample('Q').ffill().pct_change()
+        Qrtrn['r'] = atl['Close'].resample('M').ffill().pct_change()
         QRtrn = Qrtrn['r'].to_list()
         QRtrn.sort()
         del QRtrn[0:int(len(QRtrn) * 0.05)]
@@ -41,9 +48,16 @@ def Covariance(stk,Yframe):
 Covar = Covariance(stocks,5)
 st = np.dot(weight.T,np.dot(Covar,weight))**0.5
 
+averg_rtr = []
+for i in np.arange(0,len(stocks)):
+    averg_rtr.append((stocks[i],Average_Q_Return[i]))
 
-print("Stock Quarterly return average: "+Average_Q_Return)
+for i in np.arange(0,len(stocks)):
+    portfolio_return = Average_Q_Return[i]*weight[i]
+
+print("Stock monthly return average: ",averg_rtr)
 print("Covariance matrix of the stock return: ")
 print(Covar)
-print(weight)
-print(st)
+print("Chosen weight: "+ str(weight))
+print("Expected portfolio return: ",round(portfolio_return,4)*100,'%')
+print("Portfolio's standard deviation: ",round(st,4)*100,'%')
