@@ -2,7 +2,6 @@ import pandas_datareader as pd
 import pandas
 import numpy as np
 import datetime as dt
-import scipy as sp
 
 stocks = ['ATL.MI','ENI.MI', 'STM.MI','SRG.MI','IP.MI','FBK.MI']
 amnt = [100,100,100,100,100,150]
