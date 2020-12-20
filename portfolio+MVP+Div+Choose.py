@@ -121,7 +121,23 @@ ewpH=0
 for o in ewp: 
     ewpH=ewpH+o**2
 Hmodewp=(ewpH-oon)/(1-oon)
-    
+
+def historical_port_return(stk, Yframe):
+    df = pandas.DataFrame()
+    Edt = dt.date.today()
+    Sdt = Edt - dt.timedelta(days=365 * Yframe)
+    for x in stk:
+        wg = weight[stocks.index(x)]
+        atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
+        Qrtrn = pandas.DataFrame()
+        Qrtrn[str(x)] = atl['Close'].resample('M').ffill().pct_change()
+        Qrtrn[str(x)] = wg*Qrtrn[str(x)]
+        PRT = Qrtrn[str(x)].to_list()
+        df[str(x)] = Qrtrn[str(x)]
+    PR = pandas.DataFrame()
+    PR['Portfolio Retrun'] = df.sum(axis =1)
+    return PR
+Portfolio_return = historical_port_return(stocks,5)
 
 print(f"""\
 stock monthly return average: {averg_rtr}.\n
@@ -142,4 +158,6 @@ Modified Herfindal Index: {Hmod} \n
     Average Return: {round(ewreturn, 4) * 100}%\n
     Standard Deviation: {round(ewstd, 4) * 100}%""")
 
-
+plt.title("Historical portfolio return")
+plt.plot(Portfolio_return)
+plt.show()
