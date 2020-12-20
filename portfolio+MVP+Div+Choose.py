@@ -46,8 +46,7 @@ def Log_return(stk,Yframe):
         Qrtrn['r'] = atl['Close'].resample('M').ffill().pct_change()
         QRtrn = Qrtrn['r'].to_list()
         QRtrn.sort()
-        del QRtrn[0:int(len(QRtrn) * 0.05)]
-        del QRtrn[(len(QRtrn) - int(len(QRtrn) * 0.05)):-1]
+        QRtrn = QRtrn[9:50]
         Average_return = np.average(QRtrn)
         rtrn.append(Average_return)
     return rtrn
@@ -137,7 +136,7 @@ Composition: {x} \n
 Expected Return: {round(xret, 5) * 100}% \n
 Standard Deviation: {round(xvar, 5) * 100}% \n
 \n
-        Diversification Analysis:   \n
+     Diversification Analysis:   \n
 Modified Herfindal Index: {Hmod} \n
     Composition {ewpt} \n
     Average Return: {round(ewreturn, 4) * 100}%\n
