@@ -3,8 +3,11 @@ import pandas
 import numpy as np
 import datetime as dt
 
-stocks = ['ATL.MI','ENI.MI', 'STM.MI','SRG.MI','IP.MI','FBK.MI']
-amnt = [1000,50,300,5,100,150]
+stocks = ["CPR.MI","RACE.MI","PST.MI","G.MI", "LDO.MI", "PRY.MI","SPM.MI","MB.MI","UNI.MI","REC.MI","FCA.MI","BPE.MI","MONC.MI",
+         "ENI.MI","BZU.MI","IP.MI","TIT.MI","SRG.MI","STM.MI","TRN.MI","BMED.MI","AZM.MI","BAMI.MI","TEN.MI","IG.MI","FBK.MI",
+         "DIA.MI","ATL.MI", "CNHI.MI"]
+#Including "PIRC.MI" will leed to an error in calculating the covariance matrix
+amnt = [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
 
 '''
 i=True
@@ -50,10 +53,11 @@ def Log_return(stk,Yframe):
     return rtrn
 Average_Q_Return = Log_return(stocks,5)
 
-def Covariance(stk,Yframe):
+def Covariance(stk, Yframe):
     Stock_MTRX = pandas.DataFrame()
     Edt = dt.date.today()
     Sdt = Edt - dt.timedelta(days=365 * Yframe)
+    Stock_MTRX = pandas.DataFrame()
     for x in stk:
         filler = 0
         atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
@@ -61,11 +65,11 @@ def Covariance(stk,Yframe):
         Qrtrn['r'] = atl['Close'].resample('M').ffill().pct_change()
         QRtrn = Qrtrn['r'].to_list()
         QRtrn.sort()
-        del QRtrn[0:int(len(QRtrn) * 0.05)]
-        del QRtrn[(len(QRtrn) - int(len(QRtrn) * 0.05)):-1]
-        Stock_MTRX[x] = np.asarray(QRtrn)
-    cova = Stock_MTRX.cov()
-    return cova
+        QRtrn = QRtrn[9:50]
+        QRT = pandas.Series(QRtrn)
+        Stock_MTRX[str(x)] = QRT.values
+    return Stock_MTRX.cov()
+
 Covar = Covariance(stocks,5)
 st = np.dot(weight.T,np.dot(Covar,weight))**0.5
 
@@ -120,25 +124,23 @@ for o in ewp:
 Hmodewp=(ewpH-oon)/(1-oon)
     
 
+print(f"""\
+stock monthly return average: {averg_rtr}.\n
+ Covariance matrix:\n
+{Covar}\n
+Chosen weight: {weight}. \n
+Expected portfolio return: {round(portfolio_return, 4) * 100}%.\n
+Portfolio's standard deviation: {round(st, 4) * 100} % \n
+\n
+Minimum Variance Portfolio, given target expected return: {k}. \n
+Composition: {x} \n
+Expected Return: {round(xret, 5) * 100}% \n
+Standard Deviation: {round(xvar, 5) * 100}% \n
+\n
+        Diversification Analysis:   \n
+Modified Herfindal Index: {Hmod} \n
+    Composition {ewpt} \n
+    Average Return: {round(ewreturn, 4) * 100}%\n
+    Standard Deviation: {round(ewstd, 4) * 100}%""")
 
-print("Stock monthly return average: ",averg_rtr)
-print("Covariance matrix of the stock return: ")
-print(Covar)
-print("Chosen weight: "+ str(weight))
-print("Expected portfolio return: ",round(portfolio_return,4)*100,'%')
-print("Portfolio's standard deviation: ",round(st,4)*100,'%')
-print("")
-print("")
-print("Minimum Variance Portfolio, given target expected return: ", k)
-print("Composition: ", x)
-print("Expected Return: ",round(xret,5)*100, " %")
-print("Standard Deviation: ", round(xvar,5)*100, " %")
-print("")
-print("")
-print("Diversification Analysis")
-print("   Modified Herfindal Index: ", Hmod)
-print("   Equally Weighted Portfolio:")
-print("    - Composition", ewpt)
-print("    - Average Return: ", round(ewreturn,4)*100, " %")
-print("    - Standard Deviation: ", round(ewstd,4)*100, " %")
 
