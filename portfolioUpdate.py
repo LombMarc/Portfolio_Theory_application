@@ -2,6 +2,7 @@ import pandas_datareader as pd
 import pandas
 import numpy as np
 import datetime as dt
+import matplotlib.pyplot as plt
 
 stocks = ["CPR.MI", "RACE.MI", "PST.MI", "G.MI", "LDO.MI", "PRY.MI", "SPM.MI", "MB.MI", "UNI.MI", "REC.MI", "FCA.MI",
           "BPE.MI", "MONC.MI",
@@ -215,6 +216,24 @@ def historical_port_return(stk, Yframe):
     return PR
 Portfolio_return = historical_port_return(stocks,5)
 
+def historical_port_value(stk, Yframe):
+    df = pandas.DataFrame()
+    Edt = dt.date.today()
+    Sdt = Edt - dt.timedelta(days=365 * Yframe)
+    for x in stk:
+        am = amnt[stocks.index(x)]
+        atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
+        Qrtrn = pandas.DataFrame()
+        Qrtrn[str(x)] = atl['Close'].resample('M').ffill()
+        Qrtrn[str(x)] = am * Qrtrn[str(x)]
+        PRT = Qrtrn[str(x)].to_list()
+        df[str(x)] = Qrtrn[str(x)]
+    PR = pandas.DataFrame()
+    PR['Portfolio Value'] = df.sum(axis=1)
+    return PR
+
+Portfolio_value = historical_port_value(stocks, 5)
+
 print(f"""\
 stock monthly return average: {averg_rtr}.\n
  Covariance matrix:\n
@@ -236,4 +255,10 @@ Modified Herfindal Index: {Hmod} \n
 
 plt.title("Historical portfolio return")
 plt.plot(Portfolio_return)
+plt.show()
+
+
+print(Portfolio_value)
+plt.title("Historical portfolio value")
+plt.plot(Portfolio_value)
 plt.show()
