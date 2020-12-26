@@ -52,8 +52,7 @@ def Log_return(stk,Yframe):
         Qrtrn['r'] = atl['Close'].resample('M').ffill().pct_change()
         QRtrn = Qrtrn['r'].to_list()
         QRtrn.sort()
-        del QRtrn[0:int(len(QRtrn) * 0.05)]
-        del QRtrn[(len(QRtrn) - int(len(QRtrn) * 0.05)):-1]
+        QRtrn = QRtrn[9:50]
         Average_return = np.average(QRtrn)
         rtrn.append(Average_return)
     return rtrn
