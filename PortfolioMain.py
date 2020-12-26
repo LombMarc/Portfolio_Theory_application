@@ -3,6 +3,7 @@ import pandas
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
+import scipy.integrate as int
 
 stocks = ["CPR.MI", "RACE.MI", "PST.MI", "G.MI", "LDO.MI", "PRY.MI", "SPM.MI", "MB.MI", "UNI.MI", "REC.MI", "FCA.MI",
           "BPE.MI", "MONC.MI",
@@ -236,6 +237,33 @@ def historical_port_value(stk, Yframe):
 
 Portfolio_value = historical_port_value(stocks, 5)
 
+def Prob_Distr_return(stk,Yframe):
+    df = pandas.DataFrame()
+    Edt = dt.date.today()
+    Sdt = Edt - dt.timedelta(days=365 * Yframe)
+    for x in stk:
+        wg = weight[stocks.index(x)]
+        atl = pd.DataReader(x, data_source='yahoo', start=Sdt, end=Edt)
+        Qrtrn = pandas.DataFrame()
+        Qrtrn[str(x)] = atl['Close'].resample('W').ffill().pct_change()
+        Qrtrn[str(x)] = wg * Qrtrn[str(x)]
+        PRT = Qrtrn[str(x)].to_list()
+        df[str(x)] = Qrtrn[str(x)]
+    PR = pandas.DataFrame()
+    PR['Portfolio Retrun'] = df.sum(axis=1)
+    Pr = PR['Portfolio Retrun'].to_list()
+    DF = Pr[1:-1]
+    dist = ss.gaussian_kde(DF)
+    X = np.linspace(min(DF), max(DF), len(DF))
+    plt.title("PDF")
+    plt.hist(DF, density=True, bins=20)
+    plt.plot(X, dist.pdf(X), label='PDF')
+    plt.axvline(PR['Portfolio Retrun'].mean(), ymax=(0.95), color='r', label=('average return', PR['Portfolio Retrun'].mean()))
+    plt.legend()
+    plt.show()
+    return dist
+Prob_ds = Prob_Distr_return(stocks,5)
+
 print(f"""\
 stock monthly return average: {averg_rtr}.\n
  Covariance matrix:\n
@@ -264,3 +292,8 @@ print(Portfolio_value)
 plt.title("Historical portfolio value")
 plt.plot(Portfolio_value)
 plt.show()
+
+def Pos_ret_prob(a,b):
+    probability=int.quad(Prob_ds,a,b)
+    print('probability of portfolio return between ',a,' and ', b,' is: ',probability[0]-probability[1])
+Prob = Pos_ret_prob(0,0.3)
