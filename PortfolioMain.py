@@ -32,6 +32,8 @@ while i==True:
 kinp=input("Choose Target Expected Return: ")
 if len(kinp)<1:
     k=0.0036
+else:
+    k=float(kinp)
         
 SUM =sum(amnt)
 weight =[]
