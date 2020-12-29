@@ -8,4 +8,6 @@ In particular it include:
   - minimum variance portfolio given an expectd return;
   - historical portfolio value 
 and much more!
+
+
 Marco Lombardi and Diego Ciccia will update frequently the repositories including new features and function.
