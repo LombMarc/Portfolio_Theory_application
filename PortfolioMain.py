@@ -3,7 +3,8 @@ import pandas
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
-import scipy.integrate as int
+import scipy.integrate as intg
+import scipy.stats as ss
 
 stocks = ["CPR.MI", "RACE.MI", "PST.MI", "G.MI", "LDO.MI", "PRY.MI", "SPM.MI", "MB.MI", "UNI.MI", "REC.MI", "FCA.MI",
           "BPE.MI", "MONC.MI",
@@ -293,6 +294,6 @@ plt.plot(Portfolio_value)
 plt.show()
 
 def Pos_ret_prob(a,b):
-    probability=int.quad(Prob_ds,a,b)
+    probability=intg.quad(Prob_ds,a,b)
     print('probability of portfolio return between ',a,' and ', b,' is: ',probability[0]-probability[1])
 Prob = Pos_ret_prob(0,0.3)
